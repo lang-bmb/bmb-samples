@@ -1,0 +1,7 @@
+-- Hello World - First BMB program
+-- The simplest possible BMB program
+
+fn main() -> i64 = {
+    println(42);  -- Print a number
+    0             -- Return success
+};

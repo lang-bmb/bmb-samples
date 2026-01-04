@@ -1,0 +1,107 @@
+-- Dynamic Programming - Memoization and optimal substructure patterns
+-- BMB uses recursion with explicit state passing
+
+-- Fibonacci with memoization simulation
+-- Since BMB doesn't have arrays yet, we use mathematical properties
+fn fib_fast(n: i64) -> i64
+  pre n >= 0
+= fib_iter(n, 0, 1);
+
+fn fib_iter(n: i64, a: i64, b: i64) -> i64 =
+    if n == 0 then a
+    else fib_iter(n - 1, b, a + b);
+
+-- Binomial coefficient C(n, k) using Pascal's triangle property
+fn binomial_iter(n: i64, k: i64) -> i64
+  pre n >= 0
+  pre k >= 0
+  pre k <= n
+=
+    if k == 0 or k == n then 1
+    else binomial_iter(n - 1, k - 1) + binomial_iter(n - 1, k);
+
+fn binomial(n: i64, k: i64) -> i64
+  pre n >= 0
+  pre k >= 0
+  pre k <= n
+= binomial_iter(n, k);
+
+-- Catalan numbers: C_n = (2n)! / ((n+1)! * n!)
+fn catalan(n: i64) -> i64
+  pre n >= 0
+= binomial(2 * n, n) / (n + 1);
+
+-- Partition count: ways to partition n using parts <= max
+fn partition_iter(n: i64, max: i64) -> i64
+  pre n >= 0
+  pre max >= 1
+=
+    if n == 0 then 1
+    else if max == 0 or n < 0 then 0
+    else if max > n then partition_iter(n, n)
+    else partition_iter(n - max, max) + partition_iter(n, max - 1);
+
+fn partition_count(n: i64) -> i64
+  pre n >= 0
+= partition_iter(n, n);
+
+-- Coin change: minimum coins needed (simplified with fixed denominations)
+-- Denominations: 1, 5, 10, 25
+fn min_coins_iter(amount: i64) -> i64
+  pre amount >= 0
+=
+    if amount == 0 then 0
+    else if amount >= 25 then 1 + min_coins_iter(amount - 25)
+    else if amount >= 10 then 1 + min_coins_iter(amount - 10)
+    else if amount >= 5 then 1 + min_coins_iter(amount - 5)
+    else 1 + min_coins_iter(amount - 1);
+
+fn min_coins(amount: i64) -> i64
+  pre amount >= 0
+  post ret >= 0
+= min_coins_iter(amount);
+
+-- Longest increasing subsequence length (simplified for sequence 1..n)
+-- For arbitrary sequences, would need array support
+fn lis_natural(n: i64) -> i64
+  pre n >= 0
+  post ret == n  -- For 1..n, LIS is n itself
+= n;
+
+-- Maximum subarray sum (Kadane's algorithm pattern)
+-- Simplified: find max sum of contiguous positive run
+fn kadane_iter(pos: i64, n: i64, current: i64, best: i64) -> i64 =
+    if pos > n then best
+    else let val = get_sequence_value(pos);
+         let new_current = if current + val > val then current + val else val;
+         let new_best = if new_current > best then new_current else best;
+         kadane_iter(pos + 1, n, new_current, new_best);
+
+-- Simulated sequence: alternating positive/negative
+fn get_sequence_value(pos: i64) -> i64 =
+    if pos - (pos / 2) * 2 == 0 then 0 - pos else pos;
+
+fn max_subarray_sum(n: i64) -> i64
+  pre n > 0
+= kadane_iter(1, n, 0, 0);
+
+fn main() -> i64 = {
+    -- Fibonacci
+    let u0 = println(fib_fast(10));  -- 55
+    let u1 = println(fib_fast(20));  -- 6765
+
+    -- Binomial coefficients
+    let u2 = println(binomial(5, 2));  -- 10
+    let u3 = println(binomial(10, 3)); -- 120
+
+    -- Catalan numbers
+    let u4 = println(catalan(4));  -- 14
+
+    -- Partition count
+    let u5 = println(partition_count(5));  -- 7 (ways to partition 5)
+
+    -- Minimum coins for 67 cents
+    let u6 = println(min_coins(67));  -- 6 (25+25+10+5+1+1)
+
+    0
+};

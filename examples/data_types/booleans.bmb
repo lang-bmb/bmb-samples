@@ -1,0 +1,37 @@
+-- Booleans - true/false values and logical operations
+-- BMB has first-class boolean type with short-circuit evaluation
+
+fn main() -> i64 = {
+    let t = true;
+    let f = false;
+
+    -- Logical AND (short-circuit)
+    let and_tt = t and t;  -- true
+    let and_tf = t and f;  -- false
+    let and_ff = f and f;  -- false
+
+    -- Logical OR (short-circuit)
+    let or_tt = t or t;    -- true
+    let or_tf = t or f;    -- true
+    let or_ff = f or f;    -- false
+
+    -- Logical NOT
+    let not_t = not t;     -- false
+    let not_f = not f;     -- true
+
+    -- Print as 1/0
+    let u0 = println(if and_tt then 1 else 0);
+    let u1 = println(if and_tf then 1 else 0);
+    let u2 = println(if or_tf then 1 else 0);
+    let u3 = println(if not_t then 1 else 0);
+
+    -- Complex expressions
+    let complex = (t or f) and (not f);  -- true
+    let u4 = println(if complex then 1 else 0);
+
+    -- Boolean in conditions
+    let result = if t and not f then 100 else 0;
+    let u5 = println(result);  -- 100
+
+    0
+};

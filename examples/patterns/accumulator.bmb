@@ -1,0 +1,70 @@
+-- Accumulator Pattern - Tail-recursive iteration
+-- Transform loops into recursive functions with accumulators
+
+-- Sum of 1 to n
+fn sum_iter(n: i64, acc: i64) -> i64 =
+    if n <= 0 then acc
+    else sum_iter(n - 1, acc + n);
+
+fn sum_to(n: i64) -> i64
+  pre n >= 0
+  post ret == n * (n + 1) / 2
+= sum_iter(n, 0);
+
+-- Product of 1 to n (factorial)
+fn product_iter(n: i64, acc: i64) -> i64 =
+    if n <= 1 then acc
+    else product_iter(n - 1, acc * n);
+
+fn product_to(n: i64) -> i64
+  pre n >= 0
+  post ret >= 1
+= product_iter(n, 1);
+
+-- Count digits
+fn count_iter(n: i64, count: i64) -> i64 =
+    if n < 10 then count + 1
+    else count_iter(n / 10, count + 1);
+
+fn count_digits(n: i64) -> i64
+  pre n >= 0
+  post ret >= 1
+= count_iter(n, 0);
+
+-- Reverse number
+fn reverse_iter(n: i64, acc: i64) -> i64 =
+    if n <= 0 then acc
+    else reverse_iter(n / 10, acc * 10 + n - (n / 10) * 10);
+
+fn reverse_number(n: i64) -> i64
+  pre n >= 0
+= reverse_iter(n, 0);
+
+-- Check palindrome number
+fn is_palindrome(n: i64) -> bool
+  pre n >= 0
+= n == reverse_number(n);
+
+-- Count specific digit in number
+fn count_digit_iter(n: i64, digit: i64, count: i64) -> i64 =
+    if n <= 0 then count
+    else let last = n - (n / 10) * 10;
+         let new_count = if last == digit then count + 1 else count;
+         count_digit_iter(n / 10, digit, new_count);
+
+fn count_digit(n: i64, digit: i64) -> i64
+  pre n >= 0 and digit >= 0 and digit <= 9
+  post ret >= 0
+= if n == 0 and digit == 0 then 1
+  else count_digit_iter(n, digit, 0);
+
+fn main() -> i64 = {
+    let u0 = println(sum_to(10));         -- 55
+    let u1 = println(product_to(5));      -- 120
+    let u2 = println(count_digits(12345));-- 5
+    let u3 = println(reverse_number(123));-- 321
+    let u4 = println(if is_palindrome(121) then 1 else 0); -- 1
+    let u5 = println(count_digit(1122331, 1)); -- 3
+
+    0
+};

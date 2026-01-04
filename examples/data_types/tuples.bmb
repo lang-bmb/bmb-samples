@@ -1,0 +1,105 @@
+-- Tuples - Pair and triple encoding patterns
+-- BMB uses encoding to represent compound values
+
+-- Pair encoding: (a, b) where a, b in range [0, 65535]
+fn make_pair(a: i64, b: i64) -> i64
+  pre a >= 0 and a < 65536
+  pre b >= 0 and b < 65536
+= a + b * 65536;
+
+fn fst(pair: i64) -> i64
+  pre pair >= 0
+  post ret >= 0 and ret < 65536
+= pair - (pair / 65536) * 65536;
+
+fn snd(pair: i64) -> i64
+  pre pair >= 0
+  post ret >= 0 and ret < 65536
+= pair / 65536;
+
+-- Pair operations
+fn swap_pair(pair: i64) -> i64 =
+    make_pair(snd(pair), fst(pair));
+
+fn map_pair(pair: i64, op: i64) -> i64 =
+    let a = fst(pair);
+    let b = snd(pair);
+    let new_a = apply_op(a, op);
+    let new_b = apply_op(b, op);
+    make_pair(new_a, new_b);
+
+fn apply_op(x: i64, op: i64) -> i64 =
+    if op == 1 then x + 1
+    else if op == 2 then x * 2
+    else x;
+
+-- Triple encoding: (a, b, c) where each in [0, 255]
+fn make_triple(a: i64, b: i64, c: i64) -> i64
+  pre a >= 0 and a < 256
+  pre b >= 0 and b < 256
+  pre c >= 0 and c < 256
+= a + b * 256 + c * 65536;
+
+fn triple_first(t: i64) -> i64 = t - (t / 256) * 256;
+fn triple_second(t: i64) -> i64 = (t / 256) - ((t / 256) / 256) * 256;
+fn triple_third(t: i64) -> i64 = t / 65536;
+
+-- RGB color as triple
+fn make_rgb(r: i64, g: i64, b: i64) -> i64
+  pre r >= 0 and r < 256
+  pre g >= 0 and g < 256
+  pre b >= 0 and b < 256
+= make_triple(r, g, b);
+
+fn rgb_red(color: i64) -> i64 = triple_first(color);
+fn rgb_green(color: i64) -> i64 = triple_second(color);
+fn rgb_blue(color: i64) -> i64 = triple_third(color);
+
+fn rgb_brightness(color: i64) -> i64
+  post ret >= 0 and ret < 256
+= (rgb_red(color) + rgb_green(color) + rgb_blue(color)) / 3;
+
+fn rgb_invert(color: i64) -> i64 =
+    make_rgb(255 - rgb_red(color), 255 - rgb_green(color), 255 - rgb_blue(color));
+
+-- Point2D operations using pairs
+fn point_add(p1: i64, p2: i64) -> i64 =
+    make_pair(fst(p1) + fst(p2), snd(p1) + snd(p2));
+
+fn point_distance_squared(p1: i64, p2: i64) -> i64 =
+    let dx = fst(p2) - fst(p1);
+    let dy = snd(p2) - snd(p1);
+    dx * dx + dy * dy;
+
+fn main() -> i64 = {
+    -- Basic pair operations
+    let p = make_pair(10, 20);
+    let u0 = println(fst(p));  -- 10
+    let u1 = println(snd(p));  -- 20
+
+    let swapped = swap_pair(p);
+    let u2 = println(fst(swapped));  -- 20
+    let u3 = println(snd(swapped));  -- 10
+
+    -- Triple / RGB
+    let color = make_rgb(255, 128, 64);
+    let u4 = println(rgb_red(color));    -- 255
+    let u5 = println(rgb_green(color));  -- 128
+    let u6 = println(rgb_blue(color));   -- 64
+    let u7 = println(rgb_brightness(color));  -- 149
+
+    let inverted = rgb_invert(color);
+    let u8 = println(rgb_red(inverted));  -- 0
+
+    -- Point operations
+    let p1 = make_pair(3, 4);
+    let p2 = make_pair(6, 8);
+    let sum = point_add(p1, p2);
+    let u9 = println(fst(sum));  -- 9
+    let u10 = println(snd(sum)); -- 12
+
+    let dist_sq = point_distance_squared(make_pair(0, 0), make_pair(3, 4));
+    let u11 = println(dist_sq);  -- 25 (3² + 4² = 9 + 16)
+
+    0
+};

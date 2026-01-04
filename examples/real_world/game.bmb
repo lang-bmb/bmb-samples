@@ -1,0 +1,115 @@
+-- Game - Simple game logic patterns
+-- Demonstrates game state management and scoring
+
+-- Player state: health + mana*1000 + score*1000000
+fn make_player(health: i64, mana: i64, score: i64) -> i64
+  pre health >= 0 and health <= 100
+  pre mana >= 0 and mana <= 100
+= health + mana * 1000 + score * 1000000;
+
+fn player_health(p: i64) -> i64 = p - (p / 1000) * 1000;
+fn player_mana(p: i64) -> i64 = (p / 1000) - ((p / 1000) / 1000) * 1000;
+fn player_score(p: i64) -> i64 = p / 1000000;
+
+fn is_alive(p: i64) -> bool = player_health(p) > 0;
+
+-- Combat actions
+fn take_damage(p: i64, damage: i64) -> i64
+  pre damage >= 0
+= let new_health = player_health(p) - damage;
+  let clamped = if new_health < 0 then 0 else new_health;
+  make_player(clamped, player_mana(p), player_score(p));
+
+fn heal(p: i64, amount: i64) -> i64
+  pre amount >= 0
+= let new_health = player_health(p) + amount;
+  let clamped = if new_health > 100 then 100 else new_health;
+  make_player(clamped, player_mana(p), player_score(p));
+
+fn use_mana(p: i64, cost: i64) -> i64
+  pre cost >= 0
+= if player_mana(p) < cost then p  -- Not enough mana
+  else make_player(player_health(p), player_mana(p) - cost, player_score(p));
+
+fn restore_mana(p: i64, amount: i64) -> i64
+  pre amount >= 0
+= let new_mana = player_mana(p) + amount;
+  let clamped = if new_mana > 100 then 100 else new_mana;
+  make_player(player_health(p), clamped, player_score(p));
+
+fn add_score(p: i64, points: i64) -> i64
+  pre points >= 0
+= make_player(player_health(p), player_mana(p), player_score(p) + points);
+
+-- Dice roll simulation (deterministic for testing)
+fn roll_dice(seed: i64) -> i64
+  post ret >= 1 and ret <= 6
+= let raw = (seed * 1103515245 + 12345) / 65536;
+  let positive = if raw < 0 then 0 - raw else raw;
+  (positive - (positive / 6) * 6) + 1;
+
+-- Combat round
+fn combat_round(player: i64, enemy_attack: i64, seed: i64) -> i64 =
+    let player_roll = roll_dice(seed);
+    let player_damage = player_roll * 10;
+    let enemy_damage = enemy_attack;
+    let after_attack = if player_mana(player) >= 20 then
+        add_score(use_mana(player, 20), player_damage)  -- Magic attack
+    else
+        add_score(player, player_damage / 2);  -- Basic attack, half score
+    take_damage(after_attack, enemy_damage);
+
+-- Level calculation based on score
+fn calculate_level(score: i64) -> i64
+  pre score >= 0
+  post ret >= 1
+= level_iter(score, 1, 100);
+
+fn level_iter(score: i64, level: i64, threshold: i64) -> i64 =
+    if score < threshold then level
+    else level_iter(score, level + 1, threshold * 2);
+
+-- Game over check
+fn is_game_over(p: i64) -> bool = not is_alive(p);
+
+fn final_grade(p: i64) -> i64 =
+    let score = player_score(p);
+    if score >= 10000 then 5  -- S rank
+    else if score >= 5000 then 4  -- A rank
+    else if score >= 2000 then 3  -- B rank
+    else if score >= 500 then 2   -- C rank
+    else 1;                        -- D rank
+
+fn main() -> i64 = {
+    -- Create player
+    let p = make_player(100, 50, 0);
+    let u0 = println(player_health(p));  -- 100
+    let u1 = println(player_mana(p));    -- 50
+
+    -- Take damage
+    let p2 = take_damage(p, 30);
+    let u2 = println(player_health(p2)); -- 70
+
+    -- Heal
+    let p3 = heal(p2, 50);
+    let u3 = println(player_health(p3)); -- 100 (clamped)
+
+    -- Use mana for attack
+    let p4 = use_mana(p3, 20);
+    let u4 = println(player_mana(p4));   -- 30
+
+    -- Combat round
+    let p5 = combat_round(make_player(80, 40, 100), 15, 42);
+    let u5 = println(player_health(p5)); -- Health after combat
+    let u6 = println(player_score(p5));  -- Score from attack
+
+    -- Level calculation
+    let u7 = println(calculate_level(500));   -- Level based on 500 score
+    let u8 = println(calculate_level(5000));  -- Level based on 5000 score
+
+    -- Check alive
+    let dead = take_damage(p, 150);
+    let u9 = println(if is_alive(dead) then 1 else 0);  -- 0 (dead)
+
+    0
+};

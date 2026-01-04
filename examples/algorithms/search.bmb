@@ -1,0 +1,67 @@
+-- Search Algorithms - Linear and binary search patterns
+-- Using encoded arrays (base + index * factor)
+
+-- Linear search: find value in range [0, size)
+fn linear_search_iter(target: i64, base: i64, index: i64, size: i64) -> i64 =
+    if index >= size then -1
+    else let value = base + index * 100;  -- simulated array
+         if value == target then index
+         else linear_search_iter(target, base, index + 1, size);
+
+fn linear_search(target: i64, base: i64, size: i64) -> i64
+  pre size >= 0
+  post ret >= -1 and ret < size
+= linear_search_iter(target, base, 0, size);
+
+-- Binary search on sorted sequence
+fn binary_search_iter(target: i64, base: i64, lo: i64, hi: i64) -> i64 =
+    if lo > hi then -1
+    else let mid = lo + (hi - lo) / 2;
+         let value = base + mid * 100;
+         if value == target then mid
+         else if value < target then binary_search_iter(target, base, mid + 1, hi)
+         else binary_search_iter(target, base, lo, mid - 1);
+
+fn binary_search(target: i64, base: i64, size: i64) -> i64
+  pre size >= 0
+  post ret >= -1 and ret < size
+= binary_search_iter(target, base, 0, size - 1);
+
+-- Find minimum in range
+fn find_min_iter(base: i64, index: i64, size: i64, min_val: i64, min_idx: i64) -> i64 =
+    if index >= size then min_idx
+    else let value = base + index * 100;
+         if value < min_val
+         then find_min_iter(base, index + 1, size, value, index)
+         else find_min_iter(base, index + 1, size, min_val, min_idx);
+
+fn find_min(base: i64, size: i64) -> i64
+  pre size > 0
+  post ret >= 0 and ret < size
+= find_min_iter(base, 1, size, base, 0);
+
+-- Count occurrences
+fn count_iter(target: i64, base: i64, index: i64, size: i64, count: i64) -> i64 =
+    if index >= size then count
+    else let value = base + index * 100;
+         let new_count = if value == target then count + 1 else count;
+         count_iter(target, base, index + 1, size, new_count);
+
+fn count_occurrences(target: i64, base: i64, size: i64) -> i64
+  pre size >= 0
+  post ret >= 0 and ret <= size
+= count_iter(target, base, 0, size, 0);
+
+fn main() -> i64 = {
+    let base = 1000;
+    let size = 10;
+    let target = 1500;  -- should be at index 5
+
+    let lin_result = linear_search(target, base, size);
+    let bin_result = binary_search(target, base, size);
+
+    let u0 = println(lin_result);  -- 5
+    let u1 = println(bin_result);  -- 5
+
+    0
+};

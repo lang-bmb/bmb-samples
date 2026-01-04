@@ -1,0 +1,72 @@
+-- Sorting Algorithms - Comparison-based sorts
+-- Using number encoding for array representation
+
+-- Compare two values
+fn compare(a: i64, b: i64) -> i64 =
+    if a < b then -1
+    else if a > b then 1
+    else 0;
+
+-- Swap simulation (returns indicator)
+fn should_swap(a: i64, b: i64) -> bool = a > b;
+
+-- Count inversions (measures unsortedness)
+fn count_inversions_iter(encoded: i64, i: i64, j: i64, n: i64, count: i64) -> i64 =
+    if i >= n then count
+    else if j >= n then count_inversions_iter(encoded, i + 1, i + 2, n, count)
+    else let vi = (encoded / pow10(n - i - 1)) - (encoded / pow10(n - i)) * 10;
+         let vj = (encoded / pow10(n - j - 1)) - (encoded / pow10(n - j)) * 10;
+         let new_count = if vi > vj then count + 1 else count;
+         count_inversions_iter(encoded, i, j + 1, n, new_count);
+
+fn pow10(exp: i64) -> i64 =
+    pow10_iter(exp, 1);
+
+fn pow10_iter(exp: i64, acc: i64) -> i64 =
+    if exp <= 0 then acc
+    else pow10_iter(exp - 1, acc * 10);
+
+fn count_inversions(encoded: i64, n: i64) -> i64
+  pre n >= 0
+  post ret >= 0
+= count_inversions_iter(encoded, 0, 1, n, 0);
+
+-- Bubble sort pass count (for analysis)
+fn bubble_passes(n: i64) -> i64
+  pre n >= 0
+= if n <= 1 then 0 else n - 1;
+
+-- Bubble sort comparisons
+fn bubble_comparisons(n: i64) -> i64
+  pre n >= 0
+  post ret >= 0
+= (n * (n - 1)) / 2;
+
+-- Merge sort depth (log2)
+fn log2_iter(n: i64, depth: i64) -> i64 =
+    if n <= 1 then depth
+    else log2_iter(n / 2, depth + 1);
+
+fn log2(n: i64) -> i64
+  pre n > 0
+= log2_iter(n, 0);
+
+-- Merge sort operations
+fn merge_ops(n: i64) -> i64
+  pre n > 0
+= n * log2(n);
+
+fn main() -> i64 = {
+    let n = 10;
+
+    let u0 = println(bubble_comparisons(n)); -- 45
+    let u1 = println(log2(16));              -- 4
+    let u2 = println(merge_ops(16));         -- 64
+
+    -- Example: 3,1,2 encoded as 312
+    let arr = 312;
+    let inversions = count_inversions(arr, 3);
+    let u3 = println(inversions);  -- 2 (3>1, 3>2)
+
+    0
+};

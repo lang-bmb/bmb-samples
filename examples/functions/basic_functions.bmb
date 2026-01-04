@@ -1,0 +1,32 @@
+-- Basic Functions - Function definitions and calls
+-- fn name(params) -> ReturnType = expression;
+
+-- Simple function with one parameter
+fn double(x: i64) -> i64 = x * 2;
+
+-- Function with multiple parameters
+fn add(a: i64, b: i64) -> i64 = a + b;
+
+-- Function that calls other functions
+fn quadruple(x: i64) -> i64 = double(double(x));
+
+-- Function with complex expression
+fn clamp(x: i64, lo: i64, hi: i64) -> i64 =
+    if x < lo then lo
+    else if x > hi then hi
+    else x;
+
+-- Higher-order concept: applying operation twice
+fn apply_twice(x: i64, op_is_double: bool) -> i64 =
+    if op_is_double then double(double(x))
+    else add(x, add(x, x));
+
+fn main() -> i64 = {
+    let u0 = println(double(21));         -- 42
+    let u1 = println(add(10, 32));        -- 42
+    let u2 = println(quadruple(10));      -- 40
+    let u3 = println(clamp(50, 0, 100));  -- 50
+    let u4 = println(clamp(-5, 0, 100));  -- 0
+    let u5 = println(clamp(150, 0, 100)); -- 100
+    0
+};

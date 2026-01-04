@@ -1,0 +1,102 @@
+-- Option Pattern - Maybe/Optional value handling
+-- Encodes Some(value) vs None without null references
+
+-- Option encoding: use special sentinel value for None
+-- We use i64 min value as "None" indicator
+fn none_value() -> i64 = 0 - 9223372036854775807 - 1;
+
+fn is_none(opt: i64) -> bool = opt == none_value();
+fn is_some(opt: i64) -> bool = opt != none_value();
+
+-- Create Option values
+fn some(value: i64) -> i64
+  pre value != none_value()  -- Can't wrap the sentinel
+= value;
+
+fn none() -> i64 = none_value();
+
+-- Unwrap with default
+fn unwrap_or(opt: i64, default: i64) -> i64 =
+    if is_none(opt) then default else opt;
+
+-- Map: apply function if Some
+fn option_map(opt: i64, op_type: i64) -> i64 =
+    if is_none(opt) then none()
+    else apply_transform(opt, op_type);
+
+fn apply_transform(value: i64, op_type: i64) -> i64 =
+    if op_type == 1 then value + 1       -- increment
+    else if op_type == 2 then value * 2  -- double
+    else if op_type == 3 then value * value -- square
+    else value;
+
+-- Filter: keep only if predicate true
+fn option_filter(opt: i64, pred_type: i64) -> i64 =
+    if is_none(opt) then none()
+    else if check_predicate(opt, pred_type) then opt
+    else none();
+
+fn check_predicate(value: i64, pred_type: i64) -> bool =
+    if pred_type == 1 then value > 0           -- is_positive
+    else if pred_type == 2 then value - (value / 2) * 2 == 0  -- is_even
+    else if pred_type == 3 then value < 100    -- is_small
+    else true;
+
+-- FlatMap: chain optional operations
+fn option_flatmap(opt: i64, op_type: i64) -> i64 =
+    if is_none(opt) then none()
+    else maybe_transform(opt, op_type);
+
+fn maybe_transform(value: i64, op_type: i64) -> i64 =
+    if op_type == 1 then if value > 0 then some(value * 2) else none()  -- double positive
+    else if op_type == 2 then if value != 0 then some(100 / value) else none()  -- safe divide
+    else some(value);
+
+-- Safe division returning Option
+fn safe_divide(a: i64, b: i64) -> i64 =
+    if b == 0 then none() else some(a / b);
+
+-- Safe square root (integer, returns None for negative)
+fn safe_sqrt_iter(n: i64, guess: i64) -> i64 =
+    if guess * guess > n then guess - 1
+    else if guess * guess == n then guess
+    else safe_sqrt_iter(n, guess + 1);
+
+fn safe_sqrt(n: i64) -> i64 =
+    if n < 0 then none()
+    else if n == 0 then some(0)
+    else some(safe_sqrt_iter(n, 1));
+
+fn main() -> i64 = {
+    -- Basic Some/None
+    let x = some(42);
+    let y = none();
+
+    let u0 = println(if is_some(x) then 1 else 0);  -- 1
+    let u1 = println(if is_none(y) then 1 else 0);  -- 1
+
+    -- Unwrap with default
+    let u2 = println(unwrap_or(x, 0));  -- 42
+    let u3 = println(unwrap_or(y, 0 - 1));  -- -1
+
+    -- Map: double the value
+    let doubled = option_map(x, 2);
+    let u4 = println(unwrap_or(doubled, 0));  -- 84
+
+    -- Filter: keep if positive
+    let filtered = option_filter(some(0 - 5), 1);
+    let u5 = println(if is_none(filtered) then 1 else 0);  -- 1 (negative filtered out)
+
+    -- Safe divide
+    let result = safe_divide(100, 3);
+    let u6 = println(unwrap_or(result, 0));  -- 33
+
+    let div_zero = safe_divide(100, 0);
+    let u7 = println(if is_none(div_zero) then 1 else 0);  -- 1
+
+    -- Safe sqrt
+    let sqrt_result = safe_sqrt(16);
+    let u8 = println(unwrap_or(sqrt_result, 0));  -- 4
+
+    0
+};

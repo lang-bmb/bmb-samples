@@ -1,0 +1,84 @@
+-- Higher Order - Function composition patterns
+-- Demonstrates functional programming concepts in BMB
+
+-- Apply operation twice
+fn apply_twice(x: i64, op_type: i64) -> i64 =
+    let first = apply_op(x, op_type);
+    apply_op(first, op_type);
+
+fn apply_op(x: i64, op_type: i64) -> i64 =
+    if op_type == 1 then x + 1      -- increment
+    else if op_type == 2 then x * 2  -- double
+    else if op_type == 3 then x * x  -- square
+    else x;
+
+-- Map-like: apply operation to range
+fn map_sum_iter(start: i64, end: i64, op_type: i64, acc: i64) -> i64 =
+    if start > end then acc
+    else map_sum_iter(start + 1, end, op_type, acc + apply_op(start, op_type));
+
+fn map_sum(start: i64, end: i64, op_type: i64) -> i64
+  pre start <= end
+= map_sum_iter(start, end, op_type, 0);
+
+-- Filter-like: count matching predicate
+fn filter_count_iter(start: i64, end: i64, pred_type: i64, count: i64) -> i64 =
+    if start > end then count
+    else let matches = check_pred(start, pred_type);
+         let new_count = if matches then count + 1 else count;
+         filter_count_iter(start + 1, end, pred_type, new_count);
+
+fn check_pred(x: i64, pred_type: i64) -> bool =
+    if pred_type == 1 then x - (x / 2) * 2 == 0      -- is_even
+    else if pred_type == 2 then x - (x / 2) * 2 != 0 -- is_odd
+    else if pred_type == 3 then x > 0                 -- is_positive
+    else true;
+
+fn filter_count(start: i64, end: i64, pred_type: i64) -> i64
+  pre start <= end
+= filter_count_iter(start, end, pred_type, 0);
+
+-- Reduce-like: fold operation
+fn reduce_iter(start: i64, end: i64, reduce_type: i64, acc: i64) -> i64 =
+    if start > end then acc
+    else let new_acc = reduce_op(acc, start, reduce_type);
+         reduce_iter(start + 1, end, reduce_type, new_acc);
+
+fn reduce_op(acc: i64, x: i64, reduce_type: i64) -> i64 =
+    if reduce_type == 1 then acc + x           -- sum
+    else if reduce_type == 2 then acc * x      -- product
+    else if reduce_type == 3 then if x > acc then x else acc  -- max
+    else if reduce_type == 4 then if x < acc then x else acc  -- min
+    else acc;
+
+fn reduce_sum(start: i64, end: i64) -> i64
+  pre start <= end
+= reduce_iter(start, end, 1, 0);
+
+fn reduce_product(start: i64, end: i64) -> i64
+  pre start <= end
+= reduce_iter(start, end, 2, 1);
+
+-- Compose operations: f(g(x))
+fn compose(x: i64, f_type: i64, g_type: i64) -> i64 =
+    apply_op(apply_op(x, g_type), f_type);
+
+fn main() -> i64 = {
+    -- Apply twice: double(double(3)) = 12
+    let u0 = println(apply_twice(3, 2));
+
+    -- Map sum: sum of squares from 1 to 4 = 1+4+9+16 = 30
+    let u1 = println(map_sum(1, 4, 3));
+
+    -- Filter count: even numbers from 1 to 10 = 5
+    let u2 = println(filter_count(1, 10, 1));
+
+    -- Reduce: sum 1 to 5 = 15, product 1 to 5 = 120
+    let u3 = println(reduce_sum(1, 5));
+    let u4 = println(reduce_product(1, 5));
+
+    -- Compose: increment(double(3)) = 7
+    let u5 = println(compose(3, 1, 2));
+
+    0
+};

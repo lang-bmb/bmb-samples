@@ -1,0 +1,57 @@
+-- Strings - String type and operations
+-- BMB strings are immutable sequences of characters
+
+-- Get string length
+fn string_length(s: String) -> i64 = s.len();
+
+-- Check if empty
+fn is_empty(s: String) -> bool = s.len() == 0;
+
+-- Get character at position (as ASCII code)
+fn char_at_safe(s: String, index: i64) -> i64
+  pre index >= 0 and index < s.len()
+= s.char_at(index);
+
+-- Check if character is digit
+fn is_digit_char(c: i64) -> bool = c >= 48 and c <= 57;
+
+-- Check if character is letter
+fn is_alpha_char(c: i64) -> bool =
+    (c >= 65 and c <= 90) or (c >= 97 and c <= 122);
+
+-- Count digits in string
+fn count_digits_iter(s: String, pos: i64, count: i64) -> i64 =
+    if pos >= s.len() then count
+    else let c = s.char_at(pos);
+         let new_count = if is_digit_char(c) then count + 1 else count;
+         count_digits_iter(s, pos + 1, new_count);
+
+fn count_digits(s: String) -> i64 = count_digits_iter(s, 0, 0);
+
+-- Count letters in string
+fn count_letters_iter(s: String, pos: i64, count: i64) -> i64 =
+    if pos >= s.len() then count
+    else let c = s.char_at(pos);
+         let new_count = if is_alpha_char(c) then count + 1 else count;
+         count_letters_iter(s, pos + 1, new_count);
+
+fn count_letters(s: String) -> i64 = count_letters_iter(s, 0, 0);
+
+fn main() -> i64 = {
+    let greeting = "Hello, World!";
+
+    let len = string_length(greeting);
+    let u0 = println(len);  -- 13
+
+    let first = char_at_safe(greeting, 0);
+    let u1 = println(first);  -- 72 (ASCII for 'H')
+
+    let empty = is_empty("");
+    let u2 = println(if empty then 1 else 0);  -- 1
+
+    let mixed = "abc123xyz";
+    let u3 = println(count_digits(mixed));   -- 3
+    let u4 = println(count_letters(mixed));  -- 6
+
+    0
+};
