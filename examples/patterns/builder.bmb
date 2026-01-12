@@ -1,13 +1,13 @@
--- Builder Pattern - Incremental object construction
--- Encodes builder state as accumulated integer fields
+// Builder Pattern - Incremental object construction
+// Encodes builder state as accumulated integer fields
 
--- Config builder: builds a configuration with multiple options
--- Encoding: bits represent different flags
--- Bit 0: debug mode
--- Bit 1: verbose logging
--- Bit 2: strict mode
--- Bit 3: optimizations enabled
--- Higher bits: numeric settings (timeout * 16)
+// Config builder: builds a configuration with multiple options
+// Encoding: bits represent different flags
+// Bit 0: debug mode
+// Bit 1: verbose logging
+// Bit 2: strict mode
+// Bit 3: optimizations enabled
+// Higher bits: numeric settings (timeout * 16)
 
 fn new_config_builder() -> i64 = 0;
 
@@ -22,15 +22,15 @@ fn with_timeout(builder: i64, seconds: i64) -> i64
 
 fn build_config(builder: i64) -> i64 = builder;
 
--- Config accessors
+// Config accessors
 fn is_debug(config: i64) -> bool = (config - (config / 2) * 2) == 1;
 fn is_verbose(config: i64) -> bool = ((config / 2) - ((config / 2) / 2) * 2) == 1;
 fn is_strict(config: i64) -> bool = ((config / 4) - ((config / 4) / 2) * 2) == 1;
 fn is_optimized(config: i64) -> bool = ((config / 8) - ((config / 8) / 2) * 2) == 1;
 fn get_timeout(config: i64) -> i64 = config / 16;
 
--- Rectangle builder
--- Encoding: x + y*1000 + width*1000000 + height*1000000000
+// Rectangle builder
+// Encoding: x + y*1000 + width*1000000 + height*1000000000
 fn new_rect_builder() -> i64 = 0;
 
 fn with_x(builder: i64, x: i64) -> i64
@@ -51,7 +51,7 @@ fn with_height(builder: i64, h: i64) -> i64
 
 fn build_rect(builder: i64) -> i64 = builder;
 
--- Rect accessors
+// Rect accessors
 fn rect_x(rect: i64) -> i64 = rect - (rect / 1000) * 1000;
 fn rect_y(rect: i64) -> i64 = (rect / 1000) - ((rect / 1000) / 1000) * 1000;
 fn rect_width(rect: i64) -> i64 = (rect / 1000000) - ((rect / 1000000) / 1000) * 1000;
@@ -62,7 +62,7 @@ fn rect_area(rect: i64) -> i64
 = rect_width(rect) * rect_height(rect);
 
 fn main() -> i64 = {
-    -- Build a config
+    // Build a config
     let config = build_config(
         with_timeout(
             with_optimizations(
@@ -74,12 +74,12 @@ fn main() -> i64 = {
         )
     );
 
-    let u0 = println(if is_debug(config) then 1 else 0);      -- 1
-    let u1 = println(if is_optimized(config) then 1 else 0);  -- 1
-    let u2 = println(if is_verbose(config) then 1 else 0);    -- 0
-    let u3 = println(get_timeout(config));                     -- 30
+    let u0 = println(if is_debug(config) { 1 } else { 0 });      // 1
+    let u1 = println(if is_optimized(config) { 1 } else { 0 });  // 1
+    let u2 = println(if is_verbose(config) { 1 } else { 0 });    // 0
+    let u3 = println(get_timeout(config));                     // 30
 
-    -- Build a rectangle
+    // Build a rectangle
     let rect = build_rect(
         with_height(
             with_width(
@@ -93,11 +93,11 @@ fn main() -> i64 = {
         )
     );
 
-    let u4 = println(rect_x(rect));       -- 10
-    let u5 = println(rect_y(rect));       -- 20
-    let u6 = println(rect_width(rect));   -- 100
-    let u7 = println(rect_height(rect));  -- 50
-    let u8 = println(rect_area(rect));    -- 5000
+    let u4 = println(rect_x(rect));       // 10
+    let u5 = println(rect_y(rect));       // 20
+    let u6 = println(rect_width(rect));   // 100
+    let u7 = println(rect_height(rect));  // 50
+    let u8 = println(rect_area(rect));    // 5000
 
     0
 };

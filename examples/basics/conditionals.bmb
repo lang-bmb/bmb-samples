@@ -1,28 +1,26 @@
--- Conditionals - if-then-else expressions
--- BMB uses if-then-else syntax (not if-else)
+// Conditionals - if-then-else expressions
+// BMB uses if-then-else syntax (not if-else)
 
 fn classify_number(n: i64) -> i64 =
-    if n < 0 then -1
-    else if n == 0 then 0
-    else 1;
+    if n < 0 { -1 } else if n == 0 { 0 } else { 1 };
 
 fn abs(x: i64) -> i64 =
-    if x < 0 then 0 - x else x;
+    if x < 0 { 0 - x } else { x };
 
 fn max(a: i64, b: i64) -> i64 =
-    if a > b then a else b;
+    if a > b { a } else { b };
 
 fn min(a: i64, b: i64) -> i64 =
-    if a < b then a else b;
+    if a < b { a } else { b };
 
 fn main() -> i64 = {
-    let u0 = println(classify_number(-5));  -- -1
-    let u1 = println(classify_number(0));   -- 0
-    let u2 = println(classify_number(5));   -- 1
+    let u0 = println(classify_number(-5));  // -1
+    let u1 = println(classify_number(0));   // 0
+    let u2 = println(classify_number(5));   // 1
 
-    let u3 = println(abs(-42));    -- 42
-    let u4 = println(max(10, 20)); -- 20
-    let u5 = println(min(10, 20)); -- 10
+    let u3 = println(abs(-42));    // 42
+    let u4 = println(max(10, 20)); // 20
+    let u5 = println(min(10, 20)); // 10
 
     0
 };

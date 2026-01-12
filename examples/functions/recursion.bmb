@@ -1,38 +1,33 @@
--- Recursion - Recursive function patterns
--- BMB supports both direct and tail recursion
+// Recursion - Recursive function patterns
+// BMB supports both direct and tail recursion
 
--- Direct recursion (simple but not tail-recursive)
+// Direct recursion (simple but not tail-recursive)
 fn factorial_simple(n: i64) -> i64 =
-    if n <= 1 then 1
-    else n * factorial_simple(n - 1);
+    if n <= 1 { 1 } else { n * factorial_simple(n - 1) };
 
--- Tail-recursive version with accumulator
+// Tail-recursive version with accumulator
 fn factorial_iter(n: i64, acc: i64) -> i64 =
-    if n <= 1 then acc
-    else factorial_iter(n - 1, acc * n);
+    if n <= 1 { acc } else { factorial_iter(n - 1, acc * n) };
 
 fn factorial(n: i64) -> i64 = factorial_iter(n, 1);
 
--- Fibonacci - direct recursion (inefficient)
+// Fibonacci - direct recursion (inefficient)
 fn fib_slow(n: i64) -> i64 =
-    if n <= 1 then n
-    else fib_slow(n - 1) + fib_slow(n - 2);
+    if n <= 1 { n } else { fib_slow(n - 1) + fib_slow(n - 2) };
 
--- Fibonacci - tail-recursive (efficient)
+// Fibonacci - tail-recursive (efficient)
 fn fib_iter(n: i64, a: i64, b: i64) -> i64 =
-    if n <= 0 then a
-    else fib_iter(n - 1, b, a + b);
+    if n <= 0 { a } else { fib_iter(n - 1, b, a + b) };
 
 fn fib(n: i64) -> i64 = fib_iter(n, 0, 1);
 
--- GCD using Euclidean algorithm
+// GCD using Euclidean algorithm
 fn gcd(a: i64, b: i64) -> i64 =
-    if b == 0 then a
-    else gcd(b, a - (a / b) * b);
+    if b == 0 { a } else { gcd(b, a - (a / b) * b) };
 
 fn main() -> i64 = {
-    let u0 = println(factorial(5));     -- 120
-    let u1 = println(fib(10));          -- 55
-    let u2 = println(gcd(48, 18));      -- 6
+    let u0 = println(factorial(5));     // 120
+    let u1 = println(fib(10));          // 55
+    let u2 = println(gcd(48, 18));      // 6
     0
 };

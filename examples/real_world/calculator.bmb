@@ -1,7 +1,7 @@
--- Calculator - Simple arithmetic evaluator
--- Demonstrates expression parsing and evaluation
+// Calculator - Simple arithmetic evaluator
+// Demonstrates expression parsing and evaluation
 
--- Operation codes
+// Operation codes
 fn op_add() -> i64 = 1;
 fn op_sub() -> i64 = 2;
 fn op_mul() -> i64 = 3;
@@ -9,53 +9,46 @@ fn op_div() -> i64 = 4;
 fn op_mod() -> i64 = 5;
 fn op_pow() -> i64 = 6;
 
--- Apply binary operation
+// Apply binary operation
 fn apply_op(a: i64, op: i64, b: i64) -> i64
   pre op >= 1 and op <= 6
   pre op != op_div() or b != 0
   pre op != op_mod() or b != 0
-= if op == op_add() then a + b
-  else if op == op_sub() then a - b
-  else if op == op_mul() then a * b
-  else if op == op_div() then a / b
-  else if op == op_mod() then a - (a / b) * b
-  else if op == op_pow() then power(a, b)
-  else 0;
+= if op == op_add() { a + b } else if op == op_sub() { a - b } else if op == op_mul() { a * b } else if op == op_div() { a / b } else if op == op_mod() { a - (a / b) * b } else if op == op_pow() { power(a, b) } else { 0 };
 
--- Power function
+// Power function
 fn power_iter(base: i64, exp: i64, acc: i64) -> i64 =
-    if exp <= 0 then acc
-    else power_iter(base, exp - 1, acc * base);
+    if exp <= 0 { acc } else { power_iter(base, exp - 1, acc * base) };
 
 fn power(base: i64, exp: i64) -> i64
   pre exp >= 0
 = power_iter(base, exp, 1);
 
--- Evaluate expression: num op num
+// Evaluate expression: num op num
 fn evaluate(a: i64, op: i64, b: i64) -> i64 =
     apply_op(a, op, b);
 
--- Chain operations: a op1 b op2 c (left-to-right)
+// Chain operations: a op1 b op2 c (left-to-right)
 fn chain(a: i64, op1: i64, b: i64, op2: i64, c: i64) -> i64 =
     let first_result = apply_op(a, op1, b);
     apply_op(first_result, op2, c);
 
--- Is operation higher precedence? (mul/div > add/sub)
+// Is operation higher precedence? (mul/div > add/sub)
 fn higher_prec(op1: i64, op2: i64) -> bool =
-    let p1 = if op1 == op_mul() or op1 == op_div() then 2 else 1;
-    let p2 = if op2 == op_mul() or op2 == op_div() then 2 else 1;
+    let p1 = if op1 == op_mul() or op1 == op_div() { 2 } else { 1 };
+    let p2 = if op2 == op_mul() or op2 == op_div() { 2 } else { 1 };
     p1 > p2;
 
 fn main() -> i64 = {
-    -- Basic operations
-    let u0 = println(evaluate(10, op_add(), 5));  -- 15
-    let u1 = println(evaluate(10, op_sub(), 5));  -- 5
-    let u2 = println(evaluate(10, op_mul(), 5));  -- 50
-    let u3 = println(evaluate(10, op_div(), 5));  -- 2
-    let u4 = println(evaluate(10, op_mod(), 3));  -- 1
-    let u5 = println(evaluate(2, op_pow(), 10));  -- 1024
+    // Basic operations
+    let u0 = println(evaluate(10, op_add(), 5));  // 15
+    let u1 = println(evaluate(10, op_sub(), 5));  // 5
+    let u2 = println(evaluate(10, op_mul(), 5));  // 50
+    let u3 = println(evaluate(10, op_div(), 5));  // 2
+    let u4 = println(evaluate(10, op_mod(), 3));  // 1
+    let u5 = println(evaluate(2, op_pow(), 10));  // 1024
 
-    -- Chained: (2 + 3) * 4 = 20
+    // Chained: (2 + 3) * 4 = 20
     let u6 = println(chain(2, op_add(), 3, op_mul(), 4));
 
     0

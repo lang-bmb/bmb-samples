@@ -1,7 +1,7 @@
--- Date Utilities - Calendar calculations
--- Demonstrates practical date/time operations
+// Date Utilities - Calendar calculations
+// Demonstrates practical date/time operations
 
--- Check leap year
+// Check leap year
 fn is_leap_year(year: i64) -> bool
   pre year > 0
 = let div4 = year - (year / 4) * 4 == 0;
@@ -9,25 +9,22 @@ fn is_leap_year(year: i64) -> bool
   let div400 = year - (year / 400) * 400 == 0;
   (div4 and not div100) or div400;
 
--- Days in month
+// Days in month
 fn days_in_month(month: i64, year: i64) -> i64
   pre month >= 1 and month <= 12
   pre year > 0
   post ret >= 28 and ret <= 31
-= if month == 2 then (if is_leap_year(year) then 29 else 28)
-  else if month == 4 or month == 6 or month == 9 or month == 11 then 30
-  else 31;
+= if month == 2 { (if is_leap_year(year) { 29 } else { 28 }) } else if month == 4 or month == 6 or month == 9 or month == 11 { 30 } else { 31 };
 
--- Days in year
+// Days in year
 fn days_in_year(year: i64) -> i64
   pre year > 0
   post ret == 365 or ret == 366
-= if is_leap_year(year) then 366 else 365;
+= if is_leap_year(year) { 366 } else { 365 };
 
--- Day of year (1-365/366)
+// Day of year (1-365/366)
 fn day_of_year_iter(month: i64, day: i64, year: i64, acc: i64) -> i64 =
-    if month <= 1 then acc + day
-    else day_of_year_iter(month - 1, day, year, acc + days_in_month(month - 1, year));
+    if month <= 1 { acc + day } else { day_of_year_iter(month - 1, day, year, acc + days_in_month(month - 1, year)) };
 
 fn day_of_year(month: i64, day: i64, year: i64) -> i64
   pre month >= 1 and month <= 12
@@ -35,46 +32,45 @@ fn day_of_year(month: i64, day: i64, year: i64) -> i64
   pre year > 0
 = day_of_year_iter(month, day, year, 0);
 
--- Days since epoch (Jan 1, 1970)
+// Days since epoch (Jan 1, 1970)
 fn days_since_epoch_year(year: i64, acc: i64) -> i64 =
-    if year <= 1970 then acc
-    else days_since_epoch_year(year - 1, acc + days_in_year(year - 1));
+    if year <= 1970 { acc } else { days_since_epoch_year(year - 1, acc + days_in_year(year - 1)) };
 
 fn days_since_epoch(month: i64, day: i64, year: i64) -> i64
   pre year >= 1970
 = days_since_epoch_year(year, 0) + day_of_year(month, day, year) - 1;
 
--- Day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
--- Jan 1, 1970 was Thursday (4)
+// Day of week (0=Sunday, 1=Monday, ..., 6=Saturday)
+// Jan 1, 1970 was Thursday (4)
 fn day_of_week(month: i64, day: i64, year: i64) -> i64
   pre year >= 1970
   post ret >= 0 and ret <= 6
 = let days = days_since_epoch(month, day, year);
-  let shifted = days + 4;  -- Jan 1, 1970 = Thursday
+  let shifted = days + 4;  // Jan 1, 1970 = Thursday
   let result = shifted - (shifted / 7) * 7;
-  if result < 0 then result + 7 else result;
+  if result < 0 { result + 7 } else { result };
 
--- Is weekend
+// Is weekend
 fn is_weekend(month: i64, day: i64, year: i64) -> bool
   pre year >= 1970
 = let dow = day_of_week(month, day, year);
   dow == 0 or dow == 6;
 
 fn main() -> i64 = {
-    -- Test leap years
-    let u0 = println(if is_leap_year(2000) then 1 else 0);  -- 1
-    let u1 = println(if is_leap_year(1900) then 1 else 0);  -- 0
-    let u2 = println(if is_leap_year(2024) then 1 else 0);  -- 1
+    // Test leap years
+    let u0 = println(if is_leap_year(2000) { 1 } else { 0 });  // 1
+    let u1 = println(if is_leap_year(1900) { 1 } else { 0 });  // 0
+    let u2 = println(if is_leap_year(2024) { 1 } else { 0 });  // 1
 
-    -- Days in February
-    let u3 = println(days_in_month(2, 2024));  -- 29
-    let u4 = println(days_in_month(2, 2023));  -- 28
+    // Days in February
+    let u3 = println(days_in_month(2, 2024));  // 29
+    let u4 = println(days_in_month(2, 2023));  // 28
 
-    -- Day of year
-    let u5 = println(day_of_year(1, 1, 2024));   -- 1
-    let u6 = println(day_of_year(12, 31, 2024)); -- 366
+    // Day of year
+    let u5 = println(day_of_year(1, 1, 2024));   // 1
+    let u6 = println(day_of_year(12, 31, 2024)); // 366
 
-    -- Day of week (Jan 1, 2024 is Monday = 1)
+    // Day of week (Jan 1, 2024 is Monday = 1)
     let u7 = println(day_of_week(1, 1, 2024));
 
     0

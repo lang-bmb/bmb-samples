@@ -1,26 +1,26 @@
--- Expressions - Everything is an expression in BMB
--- No statements, only expressions that return values
+// Expressions - Everything is an expression in BMB
+// No statements, only expressions that return values
 
 fn main() -> i64 = {
-    -- Arithmetic expressions
-    let a = 10 + 5 * 2;  -- 20
+    // Arithmetic expressions
+    let a = 10 + 5 * 2;  // 20
 
-    -- If-then-else is an expression
-    let b = if a > 15 then 100 else 200;
-    println(b);  -- prints 100
+    // If-then-else is an expression
+    let b = if a > 15 { 100 } else { 200 };
+    println(b);  // prints 100
 
-    -- Block expressions return their last value
+    // Block expressions return their last value
     let c = {
         let x = 10;
         let y = 20;
-        x + y  -- returns 30
+        x + y  // returns 30
     };
-    println(c);  -- prints 30
+    println(c);  // prints 30
 
-    -- Logical expressions
-    let d = true and false;      -- false
-    let e = true or false;       -- true
-    let f = not false;           -- true
+    // Logical expressions
+    let d = true and false;      // false
+    let e = true or false;       // true
+    let f = not false;           // true
 
     0
 };

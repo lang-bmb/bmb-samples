@@ -1,7 +1,7 @@
--- Validation - Input validation patterns
--- Demonstrates contract-based data validation
+// Validation - Input validation patterns
+// Demonstrates contract-based data validation
 
--- Validate age (0-150)
+// Validate age (0-150)
 fn validate_age(age: i64) -> bool = age >= 0 and age <= 150;
 
 fn safe_age(age: i64) -> i64
@@ -9,7 +9,7 @@ fn safe_age(age: i64) -> i64
   post ret >= 0 and ret <= 150
 = age;
 
--- Validate percentage (0-100)
+// Validate percentage (0-100)
 fn validate_percent(pct: i64) -> bool = pct >= 0 and pct <= 100;
 
 fn safe_percent(pct: i64) -> i64
@@ -17,36 +17,32 @@ fn safe_percent(pct: i64) -> i64
   post ret >= 0 and ret <= 100
 = pct;
 
--- Validate phone number length (10 digits)
+// Validate phone number length (10 digits)
 fn validate_phone_length(encoded: i64) -> bool =
     let digits = count_digits(encoded);
     digits == 10;
 
 fn count_digits_iter(n: i64, count: i64) -> i64 =
-    if n < 10 then count + 1
-    else count_digits_iter(n / 10, count + 1);
+    if n < 10 { count + 1 } else { count_digits_iter(n / 10, count + 1) };
 
 fn count_digits(n: i64) -> i64
   pre n >= 0
-= if n == 0 then 1 else count_digits_iter(n, 0);
+= if n == 0 { 1 } else { count_digits_iter(n, 0) };
 
--- Validate email-like string (simplified: has @ after start)
+// Validate email-like string (simplified: has @ after start)
 fn validate_email_simple(s: String) -> bool =
     s.len() >= 3 and has_at_sign(s);
 
 fn has_at_sign_iter(s: String, pos: i64, found: bool) -> bool =
-    if pos >= s.len() then found
-    else if s.char_at(pos) == 64 then true  -- @ = 64
-    else has_at_sign_iter(s, pos + 1, found);
+    if pos >= s.len() { found } else if s.char_at(pos) == 64 { true  // @ = 64 } else { has_at_sign_iter(s, pos + 1, found) };
 
 fn has_at_sign(s: String) -> bool = has_at_sign_iter(s, 0, false);
 
--- Validate credit card number (Luhn algorithm simplified)
+// Validate credit card number (Luhn algorithm simplified)
 fn luhn_checksum_iter(n: i64, pos: i64, sum: i64) -> i64 =
-    if n <= 0 then sum
-    else let digit = n - (n / 10) * 10;
-         let doubled = if pos - (pos / 2) * 2 == 1 then digit * 2 else digit;
-         let adjusted = if doubled > 9 then doubled - 9 else doubled;
+    if n <= 0 { sum } else { let digit = n - (n / 10) * 10 };
+         let doubled = if pos - (pos / 2) * 2 == 1 { digit * 2 } else { digit };
+         let adjusted = if doubled > 9 { doubled - 9 } else { doubled };
          luhn_checksum_iter(n / 10, pos + 1, sum + adjusted);
 
 fn luhn_valid(card_num: i64) -> bool
@@ -54,23 +50,23 @@ fn luhn_valid(card_num: i64) -> bool
 = let checksum = luhn_checksum_iter(card_num, 0, 0);
   checksum - (checksum / 10) * 10 == 0;
 
--- Validate range
+// Validate range
 fn in_range(value: i64, min_val: i64, max_val: i64) -> bool
   pre min_val <= max_val
 = value >= min_val and value <= max_val;
 
--- Validate positive
+// Validate positive
 fn is_positive(n: i64) -> bool = n > 0;
 fn is_non_negative(n: i64) -> bool = n >= 0;
 
 fn main() -> i64 = {
-    let u0 = println(if validate_age(25) then 1 else 0);     -- 1
-    let u1 = println(if validate_age(-5) then 1 else 0);     -- 0
-    let u2 = println(if validate_percent(50) then 1 else 0); -- 1
-    let u3 = println(if in_range(5, 1, 10) then 1 else 0);   -- 1
+    let u0 = println(if validate_age(25) { 1 } else { 0 });     // 1
+    let u1 = println(if validate_age(-5) { 1 } else { 0 });     // 0
+    let u2 = println(if validate_percent(50) { 1 } else { 0 }); // 1
+    let u3 = println(if in_range(5, 1, 10) { 1 } else { 0 });   // 1
 
     let email = "test@example.com";
-    let u4 = println(if validate_email_simple(email) then 1 else 0); -- 1
+    let u4 = println(if validate_email_simple(email) { 1 } else { 0 }); // 1
 
     0
 };

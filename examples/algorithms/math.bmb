@@ -1,60 +1,48 @@
--- Mathematical Algorithms - Number theory and math functions
+// Mathematical Algorithms - Number theory and math functions
 
--- Check if number is prime
+// Check if number is prime
 fn is_prime_iter(n: i64, d: i64) -> bool =
-    if d * d > n then true
-    else if n - (n / d) * d == 0 then false
-    else is_prime_iter(n, d + 2);
+    if d * d > n { true } else if n - (n / d) * d == 0 { false } else { is_prime_iter(n, d + 2) };
 
 fn is_prime(n: i64) -> bool
   pre n >= 0
-= if n < 2 then false
-  else if n == 2 then true
-  else if n - (n / 2) * 2 == 0 then false
-  else is_prime_iter(n, 3);
+= if n < 2 { false } else if n == 2 { true } else if n - (n / 2) * 2 == 0 { false } else { is_prime_iter(n, 3) };
 
--- Count primes up to n (prime counting function)
+// Count primes up to n (prime counting function)
 fn count_primes_iter(n: i64, current: i64, count: i64) -> i64 =
-    if current > n then count
-    else if is_prime(current) then count_primes_iter(n, current + 1, count + 1)
-    else count_primes_iter(n, current + 1, count);
+    if current > n { count } else if is_prime(current) { count_primes_iter(n, current + 1, count + 1) } else { count_primes_iter(n, current + 1, count) };
 
 fn count_primes(n: i64) -> i64
   pre n >= 0
   post ret >= 0
 = count_primes_iter(n, 2, 0);
 
--- Sum of divisors
+// Sum of divisors
 fn sum_divisors_iter(n: i64, d: i64, sum: i64) -> i64 =
-    if d > n / 2 then sum + n
-    else if n - (n / d) * d == 0 then sum_divisors_iter(n, d + 1, sum + d)
-    else sum_divisors_iter(n, d + 1, sum);
+    if d > n / 2 { sum + n } else if n - (n / d) * d == 0 { sum_divisors_iter(n, d + 1, sum + d) } else { sum_divisors_iter(n, d + 1, sum) };
 
 fn sum_divisors(n: i64) -> i64
   pre n > 0
   post ret >= n
 = sum_divisors_iter(n, 1, 0);
 
--- Check if perfect number (sum of proper divisors = n)
+// Check if perfect number (sum of proper divisors = n)
 fn is_perfect(n: i64) -> bool
   pre n > 0
 = sum_divisors(n) - n == n;
 
--- Collatz sequence length
+// Collatz sequence length
 fn collatz_len_iter(n: i64, len: i64) -> i64 =
-    if n <= 1 then len
-    else if n - (n / 2) * 2 == 0 then collatz_len_iter(n / 2, len + 1)
-    else collatz_len_iter(3 * n + 1, len + 1);
+    if n <= 1 { len } else if n - (n / 2) * 2 == 0 { collatz_len_iter(n / 2, len + 1) } else { collatz_len_iter(3 * n + 1, len + 1) };
 
 fn collatz_length(n: i64) -> i64
   pre n > 0
   post ret >= 1
 = collatz_len_iter(n, 1);
 
--- Digital root (repeated digit sum until single digit)
+// Digital root (repeated digit sum until single digit)
 fn digit_sum_iter(n: i64, sum: i64) -> i64 =
-    if n <= 0 then sum
-    else digit_sum_iter(n / 10, sum + n - (n / 10) * 10);
+    if n <= 0 { sum } else { digit_sum_iter(n / 10, sum + n - (n / 10) * 10) };
 
 fn digit_sum(n: i64) -> i64
   pre n >= 0
@@ -63,16 +51,15 @@ fn digit_sum(n: i64) -> i64
 fn digital_root(n: i64) -> i64
   pre n >= 0
   post ret >= 0 and ret <= 9
-= if n < 10 then n
-  else digital_root(digit_sum(n));
+= if n < 10 { n } else { digital_root(digit_sum(n)) };
 
 fn main() -> i64 = {
-    let u0 = println(if is_prime(17) then 1 else 0);  -- 1
-    let u1 = println(count_primes(20));               -- 8
-    let u2 = println(sum_divisors(12));               -- 28
-    let u3 = println(if is_perfect(6) then 1 else 0); -- 1
-    let u4 = println(collatz_length(27));             -- 112
-    let u5 = println(digital_root(12345));            -- 6
+    let u0 = println(if is_prime(17) { 1 } else { 0 });  // 1
+    let u1 = println(count_primes(20));               // 8
+    let u2 = println(sum_divisors(12));               // 28
+    let u3 = println(if is_perfect(6) { 1 } else { 0 }); // 1
+    let u4 = println(collatz_length(27));             // 112
+    let u5 = println(digital_root(12345));            // 6
 
     0
 };

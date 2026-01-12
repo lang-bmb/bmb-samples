@@ -1,16 +1,16 @@
--- Integers - i64 type and operations
--- BMB uses 64-bit signed integers as the primary numeric type
+// Integers - i64 type and operations
+// BMB uses 64-bit signed integers as the primary numeric type
 
 fn main() -> i64 = {
-    -- Basic arithmetic
+    // Basic arithmetic
     let a = 100;
     let b = 23;
 
-    let sum = a + b;       -- 123
-    let diff = a - b;      -- 77
-    let prod = a * b;      -- 2300
-    let quot = a / b;      -- 4 (integer division)
-    let rem = a - (a / b) * b;  -- 8 (modulo via calculation)
+    let sum = a + b;       // 123
+    let diff = a - b;      // 77
+    let prod = a * b;      // 2300
+    let quot = a / b;      // 4 (integer division)
+    let rem = a - (a / b) * b;  // 8 (modulo via calculation)
 
     let u0 = println(sum);
     let u1 = println(diff);
@@ -18,18 +18,18 @@ fn main() -> i64 = {
     let u3 = println(quot);
     let u4 = println(rem);
 
-    -- Comparison operations
-    let lt = if a < b then 1 else 0;   -- 0
-    let gt = if a > b then 1 else 0;   -- 1
-    let eq = if a == b then 1 else 0;  -- 0
+    // Comparison operations
+    let lt = if a < b { 1 } else { 0 };   // 0
+    let gt = if a > b { 1 } else { 0 };   // 1
+    let eq = if a == b { 1 } else { 0 };  // 0
 
     let u5 = println(lt);
     let u6 = println(gt);
     let u7 = println(eq);
 
-    -- Max/min values (conceptual)
-    let large = 9223372036854775807;   -- i64 max
-    let small = 0 - large - 1;         -- i64 min
+    // Max/min values (conceptual)
+    let large = 9223372036854775807;   // i64 max
+    let small = 0 - large - 1;         // i64 min
 
     0
 };
