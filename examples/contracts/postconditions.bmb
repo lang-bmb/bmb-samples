@@ -1,38 +1,35 @@
--- Postconditions - post clause for output guarantees
--- post conditions use 'ret' to refer to return value
+// Postconditions - post clause for output guarantees
+// post conditions use 'ret' to refer to return value
 
--- Absolute value is always non-negative
+// Absolute value is always non-negative
 fn abs(x: i64) -> i64
   post ret >= 0
-= if x < 0 then 0 - x else x;
+= if x < 0 { 0 - x } else { x };
 
--- Max returns a value >= both inputs
+// Max returns a value >= both inputs
 fn max(a: i64, b: i64) -> i64
   post ret >= a and ret >= b
-= if a > b then a else b;
+= if a > b { a } else { b };
 
--- Min returns a value <= both inputs
+// Min returns a value <= both inputs
 fn min(a: i64, b: i64) -> i64
   post ret <= a and ret <= b
-= if a < b then a else b;
+= if a < b { a } else { b };
 
--- Clamp keeps value in range
+// Clamp keeps value in range
 fn clamp(x: i64, lo: i64, hi: i64) -> i64
   pre lo <= hi
   post ret >= lo and ret <= hi
 = max(lo, min(hi, x));
 
--- Sign returns -1, 0, or 1
+// Sign returns -1, 0, or 1
 fn sign(x: i64) -> i64
   post ret >= -1 and ret <= 1
-= if x < 0 then -1
-  else if x > 0 then 1
-  else 0;
+= if x < 0 { -1 } else if x > 0 { 1 } else { 0 };
 
--- Factorial is always positive
+// Factorial is always positive
 fn factorial_iter(n: i64, acc: i64) -> i64 =
-    if n <= 1 then acc
-    else factorial_iter(n - 1, acc * n);
+    if n <= 1 { acc } else { factorial_iter(n - 1, acc * n) };
 
 fn factorial(n: i64) -> i64
   pre n >= 0
@@ -40,9 +37,9 @@ fn factorial(n: i64) -> i64
 = factorial_iter(n, 1);
 
 fn main() -> i64 = {
-    let u0 = println(abs(-42));          -- 42
-    let u1 = println(max(10, 20));       -- 20
-    let u2 = println(clamp(50, 0, 100)); -- 50
-    let u3 = println(sign(-5));          -- -1
+    let u0 = println(abs(-42));          // 42
+    let u1 = println(max(10, 20));       // 20
+    let u2 = println(clamp(50, 0, 100)); // 50
+    let u3 = println(sign(-5));          // -1
     0
 };

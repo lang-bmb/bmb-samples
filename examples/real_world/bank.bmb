@@ -1,7 +1,7 @@
--- Bank - Transaction and account management
--- Demonstrates financial calculations with contracts
+// Bank - Transaction and account management
+// Demonstrates financial calculations with contracts
 
--- Account encoding: balance + overdraft_limit * 1000000
+// Account encoding: balance + overdraft_limit * 1000000
 fn make_account(balance: i64, overdraft_limit: i64) -> i64
   pre overdraft_limit >= 0
 = balance + 1000000 + overdraft_limit * 1000000;
@@ -12,34 +12,32 @@ fn get_overdraft_limit(account: i64) -> i64 = (account - 1000000) / 1000000;
 fn available_funds(account: i64) -> i64 =
     get_balance(account) + get_overdraft_limit(account);
 
--- Deposit money
+// Deposit money
 fn deposit(account: i64, amount: i64) -> i64
   pre amount >= 0
   post get_balance(ret) == get_balance(account) + amount
 = make_account(get_balance(account) + amount, get_overdraft_limit(account));
 
--- Withdraw money (returns account or -1 if insufficient funds)
+// Withdraw money (returns account or -1 if insufficient funds)
 fn withdraw(account: i64, amount: i64) -> i64
   pre amount >= 0
-= if amount > available_funds(account) then 0 - 1
-  else make_account(get_balance(account) - amount, get_overdraft_limit(account));
+= if amount > available_funds(account) { 0 - 1 } else { make_account(get_balance(account) - amount, get_overdraft_limit(account)) };
 
 fn is_valid_account(account: i64) -> bool = account > 0;
 
--- Transfer between accounts (returns pair: from_account * 1000000000 + to_account)
+// Transfer between accounts (returns pair: from_account * 1000000000 + to_account)
 fn transfer(from: i64, to: i64, amount: i64) -> i64
   pre amount >= 0
   pre is_valid_account(from)
   pre is_valid_account(to)
 = let new_from = withdraw(from, amount);
-  if not is_valid_account(new_from) then 0 - 1  -- Transfer failed
-  else let new_to = deposit(to, amount);
+  if not is_valid_account(new_from) { 0 - 1  // Transfer failed } else { let new_to = deposit(to, amount) };
        new_from + new_to * 1000000000;
 
 fn transfer_from(result: i64) -> i64 = result - (result / 1000000000) * 1000000000;
 fn transfer_to(result: i64) -> i64 = result / 1000000000;
 
--- Interest calculation (annual rate in basis points, e.g., 500 = 5%)
+// Interest calculation (annual rate in basis points, e.g., 500 = 5%)
 fn calculate_interest(principal: i64, rate_bps: i64, years: i64) -> i64
   pre principal >= 0
   pre rate_bps >= 0
@@ -47,11 +45,10 @@ fn calculate_interest(principal: i64, rate_bps: i64, years: i64) -> i64
 = interest_iter(principal, rate_bps, years);
 
 fn interest_iter(amount: i64, rate_bps: i64, years_left: i64) -> i64 =
-    if years_left <= 0 then amount
-    else let interest = amount * rate_bps / 10000;
+    if years_left <= 0 { amount } else { let interest = amount * rate_bps / 10000 };
          interest_iter(amount + interest, rate_bps, years_left - 1);
 
--- Loan payment calculation (simplified)
+// Loan payment calculation (simplified)
 fn monthly_payment(principal: i64, annual_rate_bps: i64, months: i64) -> i64
   pre principal > 0
   pre months > 0
@@ -59,7 +56,7 @@ fn monthly_payment(principal: i64, annual_rate_bps: i64, months: i64) -> i64
 = let total_interest = principal * annual_rate_bps * months / 120000;
   (principal + total_interest) / months;
 
--- Transaction validation
+// Transaction validation
 fn is_valid_transaction(amount: i64) -> bool = amount > 0 and amount < 1000000;
 
 fn validate_transfer(from_balance: i64, amount: i64) -> bool
@@ -67,32 +64,32 @@ fn validate_transfer(from_balance: i64, amount: i64) -> bool
 = from_balance >= amount;
 
 fn main() -> i64 = {
-    -- Create accounts
+    // Create accounts
     let savings = make_account(10000, 0);
     let checking = make_account(500, 1000);
 
-    let u0 = println(get_balance(savings));      -- 10000
-    let u1 = println(available_funds(checking)); -- 1500 (500 + 1000 overdraft)
+    let u0 = println(get_balance(savings));      // 10000
+    let u1 = println(available_funds(checking)); // 1500 (500 + 1000 overdraft)
 
-    -- Deposit
+    // Deposit
     let savings2 = deposit(savings, 500);
-    let u2 = println(get_balance(savings2));     -- 10500
+    let u2 = println(get_balance(savings2));     // 10500
 
-    -- Withdraw
+    // Withdraw
     let checking2 = withdraw(checking, 800);
-    let u3 = println(get_balance(checking2));    -- -300 (using overdraft)
+    let u3 = println(get_balance(checking2));    // -300 (using overdraft)
 
-    -- Failed withdrawal
+    // Failed withdrawal
     let failed = withdraw(checking, 2000);
-    let u4 = println(if is_valid_account(failed) then 1 else 0);  -- 0 (failed)
+    let u4 = println(if is_valid_account(failed) { 1 } else { 0 });  // 0 (failed)
 
-    -- Interest: $1000 at 5% for 3 years
+    // Interest: $1000 at 5% for 3 years
     let future_value = calculate_interest(1000, 500, 3);
-    let u5 = println(future_value);              -- 1157 (compound interest)
+    let u5 = println(future_value);              // 1157 (compound interest)
 
-    -- Monthly payment: $12000 loan at 6% for 12 months
+    // Monthly payment: $12000 loan at 6% for 12 months
     let payment = monthly_payment(12000, 600, 12);
-    let u6 = println(payment);                   -- 1060
+    let u6 = println(payment);                   // 1060
 
     0
 };

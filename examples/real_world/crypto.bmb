@@ -1,10 +1,10 @@
--- Crypto - Basic cryptographic operations
--- Demonstrates hashing and simple encryption patterns
+// Crypto - Basic cryptographic operations
+// Demonstrates hashing and simple encryption patterns
 
--- Simple hash function (DJB2-like)
+// Simple hash function (DJB2-like)
 fn hash_combine(hash: i64, value: i64) -> i64 =
     let shifted = hash * 33;
-    let positive = if shifted < 0 then 0 - shifted else shifted;
+    let positive = if shifted < 0 { 0 - shifted } else { shifted };
     positive + value;
 
 fn hash_value(seed: i64, value: i64) -> i64 =
@@ -16,29 +16,28 @@ fn hash_pair(a: i64, b: i64) -> i64 =
 fn hash_triple(a: i64, b: i64, c: i64) -> i64 =
     hash_combine(hash_pair(a, b), c);
 
--- XOR cipher (symmetric encryption)
+// XOR cipher (symmetric encryption)
 fn xor_encrypt(plaintext: i64, key: i64) -> i64 =
     xor_bits(plaintext, key);
 
 fn xor_decrypt(ciphertext: i64, key: i64) -> i64 =
-    xor_bits(ciphertext, key);  -- XOR is symmetric
+    xor_bits(ciphertext, key);  // XOR is symmetric
 
--- Bit-level XOR (simplified for small numbers)
+// Bit-level XOR (simplified for small numbers)
 fn xor_bits(a: i64, b: i64) -> i64 =
     xor_iter(a, b, 0, 1, 0);
 
 fn xor_iter(a: i64, b: i64, pos: i64, power: i64, result: i64) -> i64 =
-    if pos >= 32 then result
-    else let bit_a = (a / power) - ((a / power) / 2) * 2;
+    if pos >= 32 { result } else { let bit_a = (a / power) - ((a / power) / 2) * 2 };
          let bit_b = (b / power) - ((b / power) / 2) * 2;
-         let xor_bit = if bit_a == bit_b then 0 else 1;
+         let xor_bit = if bit_a == bit_b { 0 } else { 1 };
          xor_iter(a, b, pos + 1, power * 2, result + xor_bit * power);
 
--- Caesar cipher (shift cipher)
+// Caesar cipher (shift cipher)
 fn caesar_shift(value: i64, shift: i64, range: i64) -> i64
   pre range > 0
 = let shifted = value + shift;
-  let positive = if shifted < 0 then shifted + range * ((0 - shifted) / range + 1) else shifted;
+  let positive = if shifted < 0 { shifted + range * ((0 - shifted) / range + 1) } else { shifted };
   positive - (positive / range) * range;
 
 fn caesar_encrypt(plaintext: i64, key: i64) -> i64 =
@@ -47,10 +46,9 @@ fn caesar_encrypt(plaintext: i64, key: i64) -> i64 =
 fn caesar_decrypt(ciphertext: i64, key: i64) -> i64 =
     caesar_shift(ciphertext, 0 - key, 256);
 
--- Simple checksum
+// Simple checksum
 fn checksum_iter(value: i64, acc: i64) -> i64 =
-    if value <= 0 then acc
-    else let digit = value - (value / 10) * 10;
+    if value <= 0 { acc } else { let digit = value - (value / 10) * 10 };
          checksum_iter(value / 10, acc + digit);
 
 fn checksum(value: i64) -> i64
@@ -58,75 +56,72 @@ fn checksum(value: i64) -> i64
   post ret >= 0
 = checksum_iter(value, 0) - (checksum_iter(value, 0) / 10) * 10;
 
--- HMAC-like: keyed hash
+// HMAC-like: keyed hash
 fn keyed_hash(message: i64, key: i64) -> i64 =
     let inner = hash_pair(key, message);
     let outer = hash_pair(key, inner);
-    outer - (outer / 1000000) * 1000000;  -- Truncate to 6 digits
+    outer - (outer / 1000000) * 1000000;  // Truncate to 6 digits
 
--- Verify integrity
+// Verify integrity
 fn verify_checksum(value: i64, expected: i64) -> bool =
     checksum(value) == expected;
 
 fn verify_hmac(message: i64, key: i64, tag: i64) -> bool =
     keyed_hash(message, key) == tag;
 
--- Password strength (simplified)
+// Password strength (simplified)
 fn password_strength(encoded: i64) -> i64 =
     let len = digit_count(encoded);
     let variety = variety_score(encoded);
     len + variety;
 
 fn digit_count(n: i64) -> i64 =
-    if n < 10 then 1
-    else 1 + digit_count(n / 10);
+    if n < 10 { 1 } else { 1 + digit_count(n / 10) };
 
 fn variety_score(n: i64) -> i64 =
     let has_small = has_digit_in_range(n, 0, 4);
     let has_large = has_digit_in_range(n, 5, 9);
-    (if has_small then 2 else 0) + (if has_large then 2 else 0);
+    (if has_small { 2 } else { 0 }) + (if has_large { 2 } else { 0 });
 
 fn has_digit_in_range(n: i64, low: i64, high: i64) -> bool =
-    if n <= 0 then false
-    else let digit = n - (n / 10) * 10;
-         if digit >= low and digit <= high then true
-         else has_digit_in_range(n / 10, low, high);
+    if n <= 0 { false } else { let digit = n - (n / 10) * 10 };
+         if digit >= low and digit <= high { true } else { has_digit_in_range(n / 10, low, high) };
 
 fn main() -> i64 = {
-    -- Hashing
+    // Hashing
     let h1 = hash_value(5381, 42);
-    let u0 = println(h1);  -- Hash of 42
+    let u0 = println(h1);  // Hash of 42
 
     let h2 = hash_pair(10, 20);
-    let u1 = println(h2);  -- Hash of pair
+    let u1 = println(h2);  // Hash of pair
 
-    -- XOR encryption/decryption
+    // XOR encryption/decryption
     let key = 12345;
     let plaintext = 9876;
     let encrypted = xor_encrypt(plaintext, key);
     let decrypted = xor_decrypt(encrypted, key);
     let u2 = println(encrypted);
-    let u3 = println(decrypted);  -- Should be 9876
+    let u3 = println(decrypted);  // Should be 9876
 
-    -- Caesar cipher
-    let shifted = caesar_encrypt(65, 3);   -- 'A' (65) + 3 = 'D' (68)
-    let u4 = println(shifted);              -- 68
+    // Caesar cipher
+    let shifted = caesar_encrypt(65, 3);   // 'A' (65) + 3 = 'D' (68)
+    let u4 = println(shifted);              // 68
     let unshifted = caesar_decrypt(shifted, 3);
-    let u5 = println(unshifted);            -- 65
+    let u5 = println(unshifted);            // 65
 
-    -- Checksum
+    // Checksum
     let cs = checksum(12345);
-    let u6 = println(cs);  -- Sum of digits mod 10 = 15 mod 10 = 5
+    let u6 = println(cs);  // Sum of digits mod 10 = 15 mod 10 = 5
 
     let valid = verify_checksum(12345, 5);
-    let u7 = println(if valid then 1 else 0);  -- 1
+    let u7 = println(if valid { 1 } else { 0 });  // 1
 
-    -- HMAC
+    // HMAC
     let tag = keyed_hash(42, 1234);
     let u8 = println(tag);
 
     let verified = verify_hmac(42, 1234, tag);
-    let u9 = println(if verified then 1 else 0);  -- 1
+    let u9 = println(if verified { 1 } else { 0 });  // 1
 
     0
 };

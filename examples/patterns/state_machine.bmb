@@ -1,71 +1,53 @@
--- State Machine Pattern - Encode state as integer
--- Useful for parsers, protocols, and workflows
+// State Machine Pattern - Encode state as integer
+// Useful for parsers, protocols, and workflows
 
--- States as constants
+// States as constants
 fn state_initial() -> i64 = 0;
 fn state_reading() -> i64 = 1;
 fn state_processing() -> i64 = 2;
 fn state_done() -> i64 = 3;
 fn state_error() -> i64 = -1;
 
--- Events as constants
+// Events as constants
 fn event_start() -> i64 = 10;
 fn event_data() -> i64 = 11;
 fn event_finish() -> i64 = 12;
 fn event_reset() -> i64 = 13;
 
--- State transition function
+// State transition function
 fn transition(state: i64, event: i64) -> i64 =
-    if state == state_initial() then
-        if event == event_start() then state_reading()
-        else if event == event_reset() then state_initial()
-        else state_error()
-    else if state == state_reading() then
-        if event == event_data() then state_processing()
-        else if event == event_reset() then state_initial()
-        else state_error()
-    else if state == state_processing() then
-        if event == event_data() then state_processing()
-        else if event == event_finish() then state_done()
-        else if event == event_reset() then state_initial()
-        else state_error()
-    else if state == state_done() then
-        if event == event_reset() then state_initial()
-        else state_done()
-    else state_error();
+    if state == state_initial() { if event == event_start() { state_reading() } else if event == event_reset() { state_initial() } else { state_error() } } else if state == state_reading() { if event == event_data() { state_processing() } else if event == event_reset() { state_initial() } else { state_error() } } else if state == state_processing() { if event == event_data() { state_processing() } else if event == event_finish() { state_done() } else if event == event_reset() { state_initial() } else { state_error() } } else if state == state_done() { if event == event_reset() { state_initial() } else { state_done() } } else { state_error() };
 
--- Check if in accepting state
+// Check if in accepting state
 fn is_accepting(state: i64) -> bool = state == state_done();
 
--- Check if in error state
+// Check if in error state
 fn is_error(state: i64) -> bool = state == state_error();
 
--- Run sequence of events
+// Run sequence of events
 fn run_iter(state: i64, events: i64, pos: i64) -> i64 =
-    if pos > 3 then state  -- max 4 events encoded
-    else let event = (events / pow10(3 - pos)) - (events / pow10(4 - pos)) * 10;
-         if event == 0 then state
-         else run_iter(transition(state, event + 10), events, pos + 1);
+    if pos > 3 { state  // max 4 events encoded } else { let event = (events / pow10(3 - pos)) - (events / pow10(4 - pos)) * 10 };
+         if event == 0 { state } else { run_iter(transition(state, event + 10), events, pos + 1) };
 
 fn pow10(exp: i64) -> i64 = pow10_iter(exp, 1);
 fn pow10_iter(exp: i64, acc: i64) -> i64 =
-    if exp <= 0 then acc else pow10_iter(exp - 1, acc * 10);
+    if exp <= 0 { acc } else { pow10_iter(exp - 1, acc * 10) };
 
 fn run_events(events: i64) -> i64 =
     run_iter(state_initial(), events, 0);
 
 fn main() -> i64 = {
-    -- Test: start -> data -> finish (events: 0, 1, 2 mapped to 10, 11, 12)
-    let seq1 = 0012;  -- start(0) -> data(1) -> finish(2)
+    // Test: start -> data -> finish (events: 0, 1, 2 mapped to 10, 11, 12)
+    let seq1 = 0012;  // start(0) -> data(1) -> finish(2)
     let final_state = run_events(seq1);
 
     let u0 = println(final_state);
-    let u1 = println(if is_accepting(final_state) then 1 else 0);
+    let u1 = println(if is_accepting(final_state) { 1 } else { 0 });
 
-    -- Test error case
-    let seq2 = 1200;  -- data before start -> error
+    // Test error case
+    let seq2 = 1200;  // data before start -> error
     let error_state = run_events(seq2);
-    let u2 = println(if is_error(error_state) then 1 else 0);
+    let u2 = println(if is_error(error_state) { 1 } else { 0 });
 
     0
 };

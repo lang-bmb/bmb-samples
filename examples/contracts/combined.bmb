@@ -1,44 +1,41 @@
--- Combined Contracts - pre and post together
--- Full contract specifications for robust code
+// Combined Contracts - pre and post together
+// Full contract specifications for robust code
 
--- Integer power with full contract
+// Integer power with full contract
 fn pow_iter(base: i64, exp: i64, acc: i64) -> i64 =
-    if exp <= 0 then acc
-    else pow_iter(base, exp - 1, acc * base);
+    if exp <= 0 { acc } else { pow_iter(base, exp - 1, acc * base) };
 
 fn pow(base: i64, exp: i64) -> i64
   pre exp >= 0
   post (exp == 0) and (ret == 1) or (exp > 0 and ret >= 1)
 = pow_iter(base, exp, 1);
 
--- Safe modulo operation
+// Safe modulo operation
 fn modulo(a: i64, b: i64) -> i64
   pre b > 0
   post ret >= 0 and ret < b
 = a - (a / b) * b;
 
--- Binary search position (returns whether found)
+// Binary search position (returns whether found)
 fn is_in_range(value: i64, lo: i64, hi: i64) -> bool
   pre lo <= hi
 = value >= lo and value <= hi;
 
--- GCD with contracts
+// GCD with contracts
 fn gcd(a: i64, b: i64) -> i64
   pre a >= 0 and b >= 0
   post ret >= 0
-= if b == 0 then a
-  else gcd(b, modulo(a, b));
+= if b == 0 { a } else { gcd(b, modulo(a, b)) };
 
--- LCM using GCD
+// LCM using GCD
 fn lcm(a: i64, b: i64) -> i64
   pre a > 0 and b > 0
   post ret >= a and ret >= b
 = (a / gcd(a, b)) * b;
 
--- Fibonacci with range contract
+// Fibonacci with range contract
 fn fib_iter(n: i64, a: i64, b: i64) -> i64 =
-    if n <= 0 then a
-    else fib_iter(n - 1, b, a + b);
+    if n <= 0 { a } else { fib_iter(n - 1, b, a + b) };
 
 fn fib(n: i64) -> i64
   pre n >= 0 and n <= 40
@@ -46,10 +43,10 @@ fn fib(n: i64) -> i64
 = fib_iter(n, 0, 1);
 
 fn main() -> i64 = {
-    let u0 = println(pow(2, 10));     -- 1024
-    let u1 = println(modulo(17, 5));  -- 2
-    let u2 = println(gcd(48, 18));    -- 6
-    let u3 = println(lcm(4, 6));      -- 12
-    let u4 = println(fib(10));        -- 55
+    let u0 = println(pow(2, 10));     // 1024
+    let u1 = println(modulo(17, 5));  // 2
+    let u2 = println(gcd(48, 18));    // 6
+    let u3 = println(lcm(4, 6));      // 12
+    let u4 = println(fib(10));        // 55
     0
 };

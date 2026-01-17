@@ -1,15 +1,15 @@
--- Variables - let bindings in BMB
--- BMB uses immutable bindings by default
+// Variables - let bindings in BMB
+// BMB uses immutable bindings by default
 
 fn main() -> i64 = {
     let x = 10;
     let y = 20;
     let sum = x + y;
-    println(sum);  -- prints 30
+    println(sum);  // prints 30
 
-    -- Shadowing is allowed
+    // Shadowing is allowed
     let x = x + 5;
-    println(x);    -- prints 15
+    println(x);    // prints 15
 
     0
 };
